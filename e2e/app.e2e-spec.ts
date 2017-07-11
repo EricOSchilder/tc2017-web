@@ -1,14 +1,14 @@
-import { Tc2017WebPage } from './app.po';
+import { AngularTrufflePage } from './app.po';
 
-describe('tc2017-web App', () => {
-  let page: Tc2017WebPage;
+describe('angular-truffle App', () => {
+  let page: AngularTrufflePage;
 
   beforeEach(() => {
-    page = new Tc2017WebPage();
+    page = new AngularTrufflePage();
   });
 
-  it('should display welcome message', () => {
+  it('should display message saying app works', () => {
     page.navigateTo();
-    expect(page.getParagraphText()).toEqual('Welcome to app!!');
+    expect(page.getParagraphText()).toEqual('app works!');
   });
 });

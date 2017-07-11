@@ -1,6 +1,6 @@
-import { browser, by, element } from 'protractor';
+import { browser, element, by } from 'protractor';
 
-export class Tc2017WebPage {
+export class AngularTrufflePage {
   navigateTo() {
     return browser.get('/');
   }
