@@ -5,10 +5,26 @@ contract Wager {
         address _sender,
         uint _amount,
         string _artist,
+        uint _round,
+        uint _betCount,
         uint _pot
     );
 
-    address public owner = msg.sender;
+    event WinnerSet(
+        address _sender,
+        string _winner,
+        uint _round
+    );
+
+    event RoundOver(
+        uint _round,
+        uint _betCount,
+        uint _winnerCount,
+        uint _payout,
+        uint _pot,
+        string _winningArtist,
+        bytes32 _rawArtist
+    );
 
     struct Round {
         uint betCount;
@@ -31,21 +47,14 @@ contract Wager {
         uint amount;
     }
 
-    uint roundNumber;
+    uint roundNumber = 0;
     mapping (uint => Round) rounds;
 
-    modifier onlyBy(address _account)
-    {
-        if (msg.sender != _account) {
-            throw;
-        }
-        _;
-    }
-    
-    function setWinningArtist(string artist) public onlyBy(owner) {
-        rounds[roundNumber].winningArtist = artist;
+    function setWinningArtist(bytes artist) public {
+        rounds[roundNumber].winningArtist = string(artist);
         payoutWinners();
         endRound();
+        WinnerSet(msg.sender, string(artist), roundNumber);
     }
 
     function endRound() private {
@@ -73,13 +82,28 @@ contract Wager {
             thisRound.winners[j].amount = winningAmount;
             thisRound.winners[j].addr.transfer(winningAmount);
         }
+
+        RoundOver(
+            roundNumber,
+            thisRound.betCount,
+            thisRound.winnerCount,
+            winningAmount,
+            thisRound.pot,
+            string(thisRound.winningArtist),
+            sha3(thisRound.winningArtist));
     }
 
-    function bet() public {
+    function() payable {
         var currentRound = rounds[roundNumber];
         currentRound.bets[currentRound.betCount] = Bet(msg.sender, msg.value, string(msg.data));
         currentRound.betCount++;
-        rounds[roundNumber].pot += msg.value;
-        BetPlaced(msg.sender, msg.value, string(msg.data), rounds[roundNumber].pot);
+        currentRound.pot += msg.value;
+        BetPlaced(
+            msg.sender,
+            msg.value,
+            string(msg.data),
+            roundNumber,
+            currentRound.betCount,
+            currentRound.pot);
     }
 }

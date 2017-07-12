@@ -10,7 +10,6 @@ import { canBeNumber } from '../util/validation';
   templateUrl: './app.component.html',
 })
 export class AppComponent {
-  //MetaCoin = contract(metaincoinArtifacts);
   Wager = contract(wagerArtifacts);
 
   // TODO add proper types these variables
@@ -27,19 +26,6 @@ export class AppComponent {
   constructor() {
     this.checkAndInstantiateWeb3();
     this.onReady();
-    
-    this.Wager.deployed()
-      .then((instance) => {
-        instance.BetPlaced().watch(function(res,err){
-          console.log(res);
-        })
-        
-        /*subscribe(res => {
-          console.log(res);
-        }, err => {
-          console.log(err);
-        })*/
-      })
   }
 
   checkAndInstantiateWeb3 = () => {
@@ -52,8 +38,12 @@ export class AppComponent {
         this.web3.personal.sendTransaction({
           from:"0x3f86b73c5248c1edae7fb33353f9aa6476938102", 
           to:instance.address, 
-          value:100000000000000000000, 
-          data:this.web3.toHex("Jake Paul")}, "Travis")
+          value:this.web3.toWei(100, "ether"), 
+          data:this.web3.toHex("Jake Paul"),
+          gas:1000000}, "Travis")
+      })
+      .then(() => {
+        this.refreshBalance();
       })
   }
 
@@ -64,12 +54,61 @@ export class AppComponent {
           from: "0x72e98c3c1be92b3195fa3a6dc62ca90e77e6f9be"
         })
       })
+      .then(() => {
+        this.refreshBalance();
+      })
   }
 
   onReady = () => {
-    // Bootstrap the MetaCoin abstraction for Use.
-    //this.MetaCoin.setProvider(this.web3.currentProvider);
+    this.refreshBalance();
     this.Wager.setProvider(this.web3.currentProvider);
+
+    this.Wager.deployed()
+      .then((instance) => {
+
+        var betPlaced = instance.BetPlaced();
+        betPlaced.watch(function(error, result) {
+          if(!error) {
+            console.log("sender: " + result.args._sender + "\n"
+              + "amount: " + result.args._amount.toNumber() + "\n"
+              + "artist: " + result.args._artist + "\n"
+              + "currentRound: " + result.args._round.toNumber() + "\n"
+              + "betCount: " + result.args._betCount.toNumber() + "\n"
+              + "roundPot: " + result.args._pot.toNumber());
+            console.log(result);
+          }
+        })
+
+        var winnerSet = instance.WinnerSet();
+        winnerSet.watch(function(error, result) {
+          if(!error) {
+            console.log("sender: " + result.args._sender + "\n"
+              + "winner: " + result.args._winner + "\n"
+              + "round: " + result.args._round.toNumber());
+            console.log(result);
+          }
+        })
+
+        var roundOver = instance.RoundOver();
+        roundOver.watch(function(error, result) {
+          if(!error) {
+            console.log("round: " + result.args._round + "\n"
+              + "betCount: " + result.args._betCount.toNumber() + "\n"
+              + "winnerCount: " + result.args._winnerCount + "\n"
+              + "payout: " + result.args._payout.toNumber() + "\n"
+              + "pot: " + result.args._pot.toNumber() + "\n"
+              + "winningArtist: " + result.args._winningArtist.toNumber() + "\n"
+              + "rawArtist: " + result.args._rawArtist);
+            console.log(result);
+          }
+        })
+      })
+
+    this.web3.eth.filter('pending').watch(function(error, result) {
+      if(!error) {
+        console.log(result);
+      }
+    })
 
     // Get the initial account balance so it can be displayed.
     this.web3.eth.getAccounts((err, accs) => {
@@ -84,34 +123,18 @@ export class AppComponent {
       }
       this.accounts = accs;
       this.account = this.accounts[0];
-
-      //this.refreshBalance();
     });
   }
 
-  /*refreshBalance = () => {
-    let meta;
-    this.MetaCoin.deployed()
-      .then((instance) => {
-        meta = instance;
-        return meta.getBalance.call(this.account, {
-          from: this.account
-        });
-      })
-      .then((value) => {
-        this.balance = value;
-      })
-      .catch((e) => {
-        console.log(e);
-        this.setStatus("Error getting balance; see log.");
-      });
+  refreshBalance = () => {
+    this.balance = this.web3.fromWei(this.web3.eth.getBalance("0x3f86b73c5248c1edae7fb33353f9aa6476938102").toNumber(), "ether");
   }
 
   setStatus = (message) => {
     this.status = message;
   }
 
-  sendCoin = () => {
+  /*sendCoin = () => {
     const amount = this.sendingAmount;
     const receiver = this.recipientAddress;
     let meta;
