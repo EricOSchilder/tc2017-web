@@ -13,7 +13,8 @@ contract Wager {
     event WinnerSet(
         address _sender,
         string _winner,
-        uint _round
+        uint _round,
+        bytes32 _data
     );
 
     event RoundOver(
@@ -50,11 +51,12 @@ contract Wager {
     uint roundNumber = 0;
     mapping (uint => Round) rounds;
 
-    function setWinningArtist(bytes artist) public {
-        rounds[roundNumber].winningArtist = string(artist);
+    function setWinningArtist(bytes artist, bytes data) public {
+        var winningArtist = string(artist);
+        rounds[roundNumber].winningArtist = winningArtist;
         payoutWinners();
         endRound();
-        WinnerSet(msg.sender, string(artist), roundNumber);
+        WinnerSet(msg.sender, winningArtist, roundNumber, data);
     }
 
     function endRound() private {
@@ -94,6 +96,10 @@ contract Wager {
     }
 
     function() payable {
+        if(msg.value != 100 ether || msg.data.length == 0) {
+            return;
+        }
+
         var currentRound = rounds[roundNumber];
         currentRound.bets[currentRound.betCount] = Bet(msg.sender, msg.value, string(msg.data));
         currentRound.betCount++;

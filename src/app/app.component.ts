@@ -18,8 +18,13 @@ export class AppComponent {
   web3: any;
 
   balance: number;
-  sendingAmount: number;
-  recipientAddress: string;
+  currentArtist: string;
+
+  betArtist: string;
+  pKey: string;
+
+  winningArtist: string;
+
   status: string;
   canBeNumber = canBeNumber;
 
@@ -35,12 +40,15 @@ export class AppComponent {
   placeBet = () => {
     this.Wager.deployed()
       .then((instance) => {
+        const artist = this.betArtist;
+        const pKey = this.pKey;
         this.web3.personal.sendTransaction({
           from:"0x3f86b73c5248c1edae7fb33353f9aa6476938102", 
           to:instance.address, 
           value:this.web3.toWei(100, "ether"), 
-          data:this.web3.toHex("Jake Paul"),
-          gas:1000000}, "Travis")
+          data:this.web3.toHex(artist),
+          gas:1000000
+        }, pKey)
       })
       .then(() => {
         this.refreshBalance();
@@ -50,9 +58,13 @@ export class AppComponent {
   endRound = () => {
     this.Wager.deployed()
       .then((instance) => {
-        instance.setWinningArtist(this.web3.toHex("Jake Paul"), { 
-          from: "0x72e98c3c1be92b3195fa3a6dc62ca90e77e6f9be"
-        })
+        instance.setWinningArtist(
+          this.web3.toHex("Jake Paul"), 
+          this.web3.toHex(""),{ 
+            from:"0x72e98c3c1be92b3195fa3a6dc62ca90e77e6f9be",
+            gas:1000000
+          }
+        )
       })
       .then(() => {
         this.refreshBalance();
@@ -65,8 +77,7 @@ export class AppComponent {
 
     this.Wager.deployed()
       .then((instance) => {
-
-        var betPlaced = instance.BetPlaced();
+        let betPlaced = instance.BetPlaced();
         betPlaced.watch(function(error, result) {
           if(!error) {
             console.log("sender: " + result.args._sender + "\n"
@@ -79,27 +90,29 @@ export class AppComponent {
           }
         })
 
-        var winnerSet = instance.WinnerSet();
-        winnerSet.watch(function(error, result) {
+        let winnerSet = instance.WinnerSet();
+        winnerSet.watch((error, result) => {
           if(!error) {
             console.log("sender: " + result.args._sender + "\n"
               + "winner: " + result.args._winner + "\n"
               + "round: " + result.args._round.toNumber());
             console.log(result);
           }
+          this.currentArtist = result.args._winner;
         })
 
-        var roundOver = instance.RoundOver();
-        roundOver.watch(function(error, result) {
+        let roundOver = instance.RoundOver();
+        roundOver.watch((error, result) => {
           if(!error) {
             console.log("round: " + result.args._round + "\n"
               + "betCount: " + result.args._betCount.toNumber() + "\n"
               + "winnerCount: " + result.args._winnerCount + "\n"
               + "payout: " + result.args._payout.toNumber() + "\n"
               + "pot: " + result.args._pot.toNumber() + "\n"
-              + "winningArtist: " + result.args._winningArtist.toNumber() + "\n"
+              + "winningArtist: " + result.args._winningArtist + "\n"
               + "rawArtist: " + result.args._rawArtist);
             console.log(result);
+            this.refreshBalance();
           }
         })
       })
@@ -110,8 +123,7 @@ export class AppComponent {
       }
     })
 
-    // Get the initial account balance so it can be displayed.
-    this.web3.eth.getAccounts((err, accs) => {
+    /*this.web3.eth.getAccounts((err, accs) => {
       if (err != null) {
         alert("There was an error fetching your accounts.");
         return;
@@ -123,7 +135,7 @@ export class AppComponent {
       }
       this.accounts = accs;
       this.account = this.accounts[0];
-    });
+    });*/
   }
 
   refreshBalance = () => {

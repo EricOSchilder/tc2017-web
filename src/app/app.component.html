@@ -2,10 +2,13 @@
   <div class="hero-body">
     <div class="container">
       <h1 class="title is-1">
-        Metacoin ~ Angular2 + Truffle Starter Dapp
+        RockChain by Omni
       </h1>
       <h2 class="title">
         You have <span class="is-medium has-underline">{{balance}}</span> OmniCoin
+      </h2>
+      <h2>
+        Now Playing: {{artist}}
       </h2>
     </div>
   </div>
@@ -15,13 +18,44 @@
   <h1 class="title">Bet OmniCoin</h1>
   <h1 class="title is-4 is-info help">{{status}}</h1>
 
-  <button
-    (click)="placeBet()"
-    class="button is-primary">
-    Place Bet
-  </button>
+  <form #betForm="ngForm">
+    <div class="field">
+      <label class="label">Artist</label>
+      <p class="control">
+        <input 
+          [(ngModel)]="betArtist"
+          class="input"
+          type="text"
+          name="betArtist"
+          required
+          #betArtistModel="ngModel">
+        </p>
+    </div>
+    <div class="field">
+      <label class="label">Private Key</label>
+      <p class="control">
+        <input 
+          [(ngModel)]="pKey"
+          class="input"
+          type="text"
+          name="pKey"
+          required
+          #pKeyModel="ngModel">
+        </p>
+    </div>
+    <div class="field is-grouped">
+      <p class="control">
+        <button
+          [disabled]="!betForm.valid"
+          (click)="placeBet()"
+          class="button is-primary">
+          Place Bet
+        </button>
+      </p>
+    </div>
+  </form>
 
-  <button
+   <button
     (click)="endRound()"
     class="button is-primary">
     End Round

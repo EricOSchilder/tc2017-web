@@ -1,15 +1,22 @@
-# Angular-Truffle
+# tc2017-web
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 1.0.0-rc.1.
+This project is the web component of the 2017 That Conference offering from Omni Resources.
 
-An angular2 + [truffle](https://github.com/trufflesuite/truffle) starter app. Write, compile & deploy smart contracts for Ethereum.
+## How to use
 
-Featured on [State of the Dapps](https://dapps.ethercasts.com/dapp/angular2-truffle-starter-dapp)
+### Part 1
 
-## Demo
-Create a coin with an initial supply and send an amount to your Ethereum wallet address
+1. `git clone https://github.com/omni-resources/tc2017-web.git`
+2. `cd tc2017-web`
+3. `npm install`
 
-![demo](src/assets/demo.gif)
+### Part 2
+
+4. `truffle compile && truffle migrate --reset` to compile your contracts
+5. `ng serve` 
+6. Navigate to `http://localhost:4200/`.
+
+# tc2017-web
 
 ## How to use
 There are 2 small parts to successfully running this project.
@@ -21,7 +28,7 @@ There are 2 small parts to successfully running this project.
 3. `npm install`
 
 ### Part 2
-For the second part, be sure you're connected to an Ethereum client before running the commands below. If you're new, install [testrpc](https://github.com/ethereumjs/testrpc) to run a local blockchain RPC server. After that, simply run `testrpc` in a new tab.
+For the second part, be sure you're connected to an Ethereum client before running the commands below.
 
 And then in the original tab, run:
 
@@ -36,7 +43,7 @@ Run `ng generate component component-name` to generate a new component. You can 
 
 ## Build
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `-prod` flag for a production build.
+Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
 
 ## Running unit tests
 
@@ -47,14 +54,6 @@ Run `ng build` to build the project. The build artifacts will be stored in the `
 
 Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
 Before running the tests make sure you are serving the app via `ng serve`.
-
-## Contribute
-
-Contributions are always welcome & encouraged! :smile: If you'd like to contribute, please see [Contributing Guidelines](CONTRIBUTE.md).
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
 
 ## Technologies & Languages Used
 1. Angular2 (Typescript/Javascript)
