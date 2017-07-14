@@ -34,7 +34,7 @@ export class AppComponent {
   }
 
   checkAndInstantiateWeb3 = () => {
-    this.web3 = new Web3(new Web3.providers.HttpProvider("http://bcjl3x55m.eastus.cloudapp.azure.com:8545"));
+    this.web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
   }
 
   placeBet = () => {
@@ -42,13 +42,14 @@ export class AppComponent {
       .then((instance) => {
         const artist = this.betArtist;
         const pKey = this.pKey;
-        this.web3.personal.sendTransaction({
-          from:"0x3f86b73c5248c1edae7fb33353f9aa6476938102", 
+        instance.bet("0xaaa49d193b68567d8cac07b202c01c0e0b887ff5", 
+        this.web3.toHex(artist), 
+        {
+          from:"0xaaa49d193b68567d8cac07b202c01c0e0b887ff5", 
           to:instance.address, 
-          value:this.web3.toWei(100, "ether"), 
-          data:this.web3.toHex(artist),
-          gas:1000000
-        }, pKey)
+          value:this.web3.toWei(1, "ether"), 
+          gas:4712388
+        })
       })
       .then(() => {
         this.refreshBalance();
@@ -58,11 +59,11 @@ export class AppComponent {
   endRound = () => {
     this.Wager.deployed()
       .then((instance) => {
-        instance.setWinningArtist(
-          this.web3.toHex("Jake Paul"), 
-          this.web3.toHex(""),{ 
-            from:"0x72e98c3c1be92b3195fa3a6dc62ca90e77e6f9be",
-            gas:1000000
+        instance.endRound(
+          this.web3.toHex("Bon Jovi"),{ 
+            from:"0xea32fcc0e17b1e867b963e4cda9a38d5ca9dcb0f",
+            gas:4712388,
+            gasPrice: this.web3.toBigNumber(10000000)
           }
         )
       })
@@ -80,37 +81,20 @@ export class AppComponent {
         let betPlaced = instance.BetPlaced();
         betPlaced.watch(function(error, result) {
           if(!error) {
-            console.log("sender: " + result.args._sender + "\n"
-              + "amount: " + result.args._amount.toNumber() + "\n"
-              + "artist: " + result.args._artist + "\n"
-              + "currentRound: " + result.args._round.toNumber() + "\n"
-              + "betCount: " + result.args._betCount.toNumber() + "\n"
-              + "roundPot: " + result.args._pot.toNumber());
+            console.log("from: " + result.args.from + "\n"
+              + "artist: " + result.args.artist + "\n"
+              + "totalPot: " + result.args.totalPot.toNumber());
             console.log(result);
           }
-        })
-
-        let winnerSet = instance.WinnerSet();
-        winnerSet.watch((error, result) => {
-          if(!error) {
-            console.log("sender: " + result.args._sender + "\n"
-              + "winner: " + result.args._winner + "\n"
-              + "round: " + result.args._round.toNumber());
-            console.log(result);
-          }
-          this.currentArtist = result.args._winner;
         })
 
         let roundOver = instance.RoundOver();
         roundOver.watch((error, result) => {
           if(!error) {
-            console.log("round: " + result.args._round + "\n"
-              + "betCount: " + result.args._betCount.toNumber() + "\n"
-              + "winnerCount: " + result.args._winnerCount + "\n"
-              + "payout: " + result.args._payout.toNumber() + "\n"
-              + "pot: " + result.args._pot.toNumber() + "\n"
-              + "winningArtist: " + result.args._winningArtist + "\n"
-              + "rawArtist: " + result.args._rawArtist);
+            console.log("payout: " + result.args.payout.toNumber() + "\n"
+              + "contractBalance: " + result.args.contractBalance.toNumber() + "\n"
+              + "totalPot: " + result.args.totalPot.toNumber() + "\n");
+            console.log(result.args.winners);
             console.log(result);
             this.refreshBalance();
           }
@@ -139,7 +123,7 @@ export class AppComponent {
   }
 
   refreshBalance = () => {
-    this.balance = this.web3.fromWei(this.web3.eth.getBalance("0x3f86b73c5248c1edae7fb33353f9aa6476938102").toNumber(), "ether");
+    this.balance = this.web3.fromWei(this.web3.eth.getBalance("0xaaa49d193b68567d8cac07b202c01c0e0b887ff5").toNumber(), "ether");
   }
 
   setStatus = (message) => {

@@ -1,115 +1,51 @@
 pragma solidity ^0.4.2;
 
 contract Wager {
-    event BetPlaced(
-        address _sender,
-        uint _amount,
-        string _artist,
-        uint _round,
-        uint _betCount,
-        uint _pot
-    );
+    event BetPlaced(address from, string artist, uint totalPot);
+    event RoundOver(address[] winners, uint payout, uint contractBalance, uint totalPot);
 
-    event WinnerSet(
-        address _sender,
-        string _winner,
-        uint _round,
-        bytes32 _data
-    );
-
-    event RoundOver(
-        uint _round,
-        uint _betCount,
-        uint _winnerCount,
-        uint _payout,
-        uint _pot,
-        string _winningArtist,
-        bytes32 _rawArtist
-    );
+    uint roundNumber;
+    mapping(uint => Round) rounds;
 
     struct Round {
-        uint betCount;
-        uint winnerCount;
-        string winningArtist;
+        mapping(bytes => address[]) bets;
+        bool isRoundCashed;
         uint pot;
-        bool isCashed;
-        mapping (uint => Bet) bets;
-        mapping (uint => Winner) winners;
     }
 
-    struct Bet {
-        address addr;
-        uint amount;
-        string artist;
-    }
-
-    struct Winner {
-        address addr;
-        uint amount;
-    }
-
-    uint roundNumber = 0;
-    mapping (uint => Round) rounds;
-
-    function setWinningArtist(bytes artist, bytes data) public {
-        var winningArtist = string(artist);
-        rounds[roundNumber].winningArtist = winningArtist;
-        payoutWinners();
-        endRound();
-        WinnerSet(msg.sender, winningArtist, roundNumber, data);
-    }
-
-    function endRound() private {
-        rounds[roundNumber].isCashed = true;
-        roundNumber++;
-    }
-
-    function payoutWinners() private {
+    function endRound(bytes artist) public {
         var thisRound = rounds[roundNumber];
 
-        if(thisRound.isCashed) {
+        if(thisRound.isRoundCashed) {
             return;
         }
 
-        for(var i = 0; i < thisRound.betCount; i++) {
-            var thisBet = thisRound.bets[i];
-            if(sha3(thisBet.artist) == sha3(thisRound.winningArtist)) {
-                thisRound.winners[thisRound.winnerCount] = Winner(thisBet.addr, 0);
-                thisRound.winnerCount++;
-            }
+        if(thisRound.bets[artist].length == 0) {
+            roundNumber++;
+            rounds[roundNumber].pot = thisRound.pot;
+            return;
         }
 
-        var winningAmount = thisRound.pot/thisRound.winnerCount;
-        for(var j = 0; j < thisRound.winnerCount; j++) {
-            thisRound.winners[j].amount = winningAmount;
-            thisRound.winners[j].addr.transfer(winningAmount);
+        var payout = thisRound.pot/thisRound.bets[artist].length;
+
+        for(uint128 i = 0; i < thisRound.bets[artist].length; i++) {
+            thisRound.bets[artist][i].transfer(payout);
         }
 
-        RoundOver(
-            roundNumber,
-            thisRound.betCount,
-            thisRound.winnerCount,
-            winningAmount,
-            thisRound.pot,
-            string(thisRound.winningArtist),
-            sha3(thisRound.winningArtist));
+        thisRound.isRoundCashed = true;
+        roundNumber++;
+        RoundOver(thisRound.bets[artist], payout, this.balance, thisRound.pot);
     }
 
-    function() payable {
-        if(msg.value != 100 ether || msg.data.length == 0) {
+    function bet(address from, bytes artist) payable {
+        var thisRound = rounds[roundNumber];
+
+        if(msg.value != 1 ether || artist.length == 0) {
             return;
         }
 
-        var currentRound = rounds[roundNumber];
-        currentRound.bets[currentRound.betCount] = Bet(msg.sender, msg.value, string(msg.data));
-        currentRound.betCount++;
-        currentRound.pot += msg.value;
-        BetPlaced(
-            msg.sender,
-            msg.value,
-            string(msg.data),
-            roundNumber,
-            currentRound.betCount,
-            currentRound.pot);
+        thisRound.pot += msg.value;
+        thisRound.bets[artist].push(from);
+        BetPlaced(from, string(artist), thisRound.pot);
     }
 }
