@@ -4,6 +4,10 @@ const contract = require('truffle-contract');
 //const metaincoinArtifacts = require('../../build/contracts/MetaCoin.json');
 const wagerArtifacts = require('../../build/contracts/Wager.json')
 import { canBeNumber } from '../util/validation';
+const SolidityFunction = require('web3/lib/web3/function');
+const _ = require('lodash');
+const Tx = require('ethereumjs-tx');
+declare const Buffer;
 
 @Component({
   selector: 'app-root',
@@ -34,7 +38,11 @@ export class AppComponent {
   }
 
   checkAndInstantiateWeb3 = () => {
-    this.web3 = new Web3(new Web3.providers.HttpProvider("http://tc20175xj.eastus.cloudapp.azure.com:8545"));
+    this.web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
+  }
+
+  unlockAccount = () => {
+    this.web3.personal.unlockAccount("0xe50c83d4d2136e2972c5b67a9544af403d192dd4", this.pKey, 1)
   }
 
   placeBet = () => {
@@ -42,16 +50,18 @@ export class AppComponent {
       .then((instance) => {
         const artist = this.betArtist;
         const pKey = this.pKey;
+        
+        //this.web3.personal.unlockAccount("0xafe52045b68d0650209b6209684890dc2bcbae96", pKey, 2);
         instance.bet.sendTransaction( 
         this.web3.toHex(artist), 
         {
-          from:"0xe50c83d4d2136e2972c5b67a9544af403d192dd4", 
+          from:"0xafe52045b68d0650209b6209684890dc2bcbae96", 
           to:instance.address, 
           value:this.web3.toWei(1, "ether"), 
           gas:4712388
         })
       })
-      .then(() => {
+      .then( () => {
         this.refreshBalance();
       })
   }
@@ -61,11 +71,10 @@ export class AppComponent {
       .then((instance) => {
         instance.endRound.sendTransaction(
           this.web3.toHex("Bon Jovi"),
-          this.web3.toHex("{ artist: Bon Jovi }"),
+          this.web3.toHex("{ \"artist\": \"Bon Jovi\" }"),
           { 
-            from:"0x72e98c3c1be92b3195fa3a6dc62ca90e77e6f9be",
-            gas:4712388,
-            gasPrice: this.web3.toBigNumber(10000000)
+            from:"0x459ff107403c90ac2ca9340e6421d9d9282399f2",
+            gas:4712388
           }
         )
       })
@@ -98,6 +107,8 @@ export class AppComponent {
               + "totalPot: " + result.args.totalPot.toNumber() + "\n");
             console.log(result.args.winners);
             console.log(result);
+
+            this.winningArtist = JSON.parse(result.args.songData).artist;
             this.refreshBalance();
           }
         })
@@ -125,7 +136,7 @@ export class AppComponent {
   }
 
   refreshBalance = () => {
-    this.balance = this.web3.fromWei(this.web3.eth.getBalance("0xaaa49d193b68567d8cac07b202c01c0e0b887ff5").toNumber(), "ether");
+    this.balance = this.web3.fromWei(this.web3.eth.getBalance("0xafe52045b68d0650209b6209684890dc2bcbae96").toNumber(), "ether");
   }
 
   setStatus = (message) => {

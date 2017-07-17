@@ -16,27 +16,6 @@ This project is the web component of the 2017 That Conference offering from Omni
 5. `ng serve` 
 6. Navigate to `http://localhost:4200/`.
 
-# tc2017-web
-
-## How to use
-There are 2 small parts to successfully running this project.
-
-### Part 1
-
-1. `git clone https://github.com/Nikhil22/angular2-truffle-starter-dapp.git`
-2. `cd angular2-truffle-starter-dapp`
-3. `npm install`
-
-### Part 2
-For the second part, be sure you're connected to an Ethereum client before running the commands below.
-
-And then in the original tab, run:
-
-4. `truffle compile` to compile your contracts
-5. `truffle migrate` to deploy those contracts to the network
-6. `ng serve`. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
-7. Make sure there are no errors in browser console
-
 ## Code scaffolding
 
 Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive/pipe/service/class/module`.

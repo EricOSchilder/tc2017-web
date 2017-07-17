@@ -8,7 +8,7 @@
         You have <span class="is-medium has-underline">{{balance}}</span> OmniCoin
       </h2>
       <h2>
-        Now Playing: {{artist}}
+        Now Playing: {{winningArtist}}
       </h2>
     </div>
   </div>
@@ -58,6 +58,12 @@
     (click)="endRound()"
     class="button is-primary">
     End Round
+  </button>
+
+  <button
+    (click)="unlockAccount()"
+    class="button is-primary">
+    Unlock Account
   </button>
   <!--<form #coinForm="ngForm">
     <div class="field">

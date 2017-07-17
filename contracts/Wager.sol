@@ -11,6 +11,7 @@ contract Wager {
         mapping(bytes => address[]) bets;
         bool isRoundCashed;
         uint pot;
+        bytes songData;
     }
 
     function endRound(bytes artist, bytes songData) public {
@@ -33,6 +34,7 @@ contract Wager {
         }
 
         thisRound.isRoundCashed = true;
+        thisRound.songData = songData;
         roundNumber++;
         RoundOver(thisRound.bets[artist], string(songData), payout, this.balance, thisRound.pot);
     }
