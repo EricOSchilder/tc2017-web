@@ -50,7 +50,7 @@ export class AppComponent {
       .then((instance) => {
         const artist = this.betArtist;
         const pKey = this.pKey;
-        
+
         //this.web3.personal.unlockAccount("0xafe52045b68d0650209b6209684890dc2bcbae96", pKey, 2);
         instance.bet.sendTransaction( 
         this.web3.toHex(artist), 
@@ -142,28 +142,4 @@ export class AppComponent {
   setStatus = (message) => {
     this.status = message;
   }
-
-  /*sendCoin = () => {
-    const amount = this.sendingAmount;
-    const receiver = this.recipientAddress;
-    let meta;
-
-    this.setStatus("Initiating transaction... (please wait)");
-
-    this.MetaCoin.deployed()
-      .then((instance) => {
-        meta = instance;
-        return meta.sendCoin(receiver, amount, {
-          from: this.account
-        });
-      })
-      .then(() => {
-        this.setStatus("Transaction complete!");
-        this.refreshBalance();
-      })
-      .catch((e) => {
-        console.log(e);
-        this.setStatus("Error sending coin; see log.");
-      });
-  }*/
 }
