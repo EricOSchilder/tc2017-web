@@ -1,133 +1,143 @@
-<section class="hero is-medium is-info is-bold">
-  <div class="hero-body">
+<div class="columns">
+  <section class="column is-three-quarters">
+    <section class="hero is-medium is-info is-bold">
+      <div class="hero-body">
+        <div class="container">
+          <h1 class="title is-1">
+            RockChain by Omni
+          </h1>
+          <h2 class="title">
+            You have <span class="is-medium has-underline">{{balance}}</span> OmniCoin
+          </h2>
+          <h2>
+            Now Playing: {{winningArtist}}
+          </h2>
+        </div>
+      </div>
+    </section>
+    <br>
     <div class="container">
-      <h1 class="title is-1">
-        RockChain by Omni
-      </h1>
-      <h2 class="title">
-        You have <span class="is-medium has-underline">{{balance}}</span> OmniCoin
-      </h2>
-      <h2>
-        Now Playing: {{winningArtist}}
-      </h2>
-    </div>
-  </div>
-</section>
-<br>
-<div class="container">
-  <h1 class="title">Bet OmniCoin</h1>
-  <h1 class="title is-4 is-info help">{{status}}</h1>
-  <form #betForm="ngForm">
-    <div class="field">
-      <label class="label">Artist</label>
-      <p class="control">
-        <input 
-          [(ngModel)]="betArtist"
-          class="input"
-          type="text"
-          name="betArtist"
-          required
-          #betArtistModel="ngModel">
-        </p>
-    </div>
-    <div class="field">
-      <label class="label">Private Key</label>
-      <p class="control">
-        <input 
-          [(ngModel)]="pKey"
-          class="input"
-          type="text"
-          name="pKey"
-          required
-          #pKeyModel="ngModel">
-        </p>
-    </div>
-    <div class="field is-grouped">
-      <p class="control">
-        <button
-          [disabled]="!betForm.valid"
-          (click)="placeBet()"
-          class="button is-primary">
-          Place Bet
-        </button>
-      </p>
-    </div>
-  </form>
+      <h1 class="title">Bet OmniCoin</h1>
+      <h1 class="title is-4 is-info help">{{status}}</h1>
+      <form #betForm="ngForm">
+        <div class="field">
+          <label class="label">Artist</label>
+          <p class="control">
+            <input 
+              [(ngModel)]="betArtist"
+              class="input"
+              type="text"
+              name="betArtist"
+              required
+              #betArtistModel="ngModel">
+            </p>
+        </div>
+        <div class="field">
+          <label class="label">Private Key</label>
+          <p class="control">
+            <input 
+              [(ngModel)]="pKey"
+              class="input"
+              type="text"
+              name="pKey"
+              required
+              #pKeyModel="ngModel">
+            </p>
+        </div>
+        <div class="field is-grouped">
+          <p class="control">
+            <button
+              [disabled]="!betForm.valid"
+              (click)="placeBet()"
+              class="button is-primary">
+              Place Bet
+            </button>
+          </p>
+        </div>
+      </form>
 
-  <button
-    (click)="endRound()"
-    class="button is-primary">
-    End Round
-  </button>
+      <button
+        (click)="endRound()"
+        class="button is-primary">
+        End Round
+      </button>
 
-  <button
-    (click)="unlockAccount()"
-    class="button is-primary">
-    Unlock Account
-  </button>
-  <!--<form #coinForm="ngForm">
-    <div class="field">
-      <label class="label">Amount</label>
-      <p class="control">
-        <input
-          [(ngModel)]="sendingAmount"
-          class="input"
-          type="text"
-          placeholder="95"
-          name="sendingAmount"
-          required
-          #sendingAmountModel="ngModel">
-      </p>
-      <div *ngIf="sendingAmountModel.errors && (sendingAmountModel.dirty || sendingAmountModel.touched)"
-           class="help is-danger">
-          <p [hidden]="!sendingAmountModel.errors.required">
-            This field is required
+      <button
+        (click)="unlockAccount()"
+        class="button is-primary">
+        Unlock Account
+      </button>
+      <!--<form #coinForm="ngForm">
+        <div class="field">
+          <label class="label">Amount</label>
+          <p class="control">
+            <input
+              [(ngModel)]="sendingAmount"
+              class="input"
+              type="text"
+              placeholder="95"
+              name="sendingAmount"
+              required
+              #sendingAmountModel="ngModel">
           </p>
-      </div>
-      <div *ngIf="!sendingAmountModel.errors && (sendingAmountModel.dirty || sendingAmountModel.touched)"
-           class="help is-danger">
-          <p [hidden]="canBeNumber(sendingAmount)">
-            Must be a number
+          <div *ngIf="sendingAmountModel.errors && (sendingAmountModel.dirty || sendingAmountModel.touched)"
+              class="help is-danger">
+              <p [hidden]="!sendingAmountModel.errors.required">
+                This field is required
+              </p>
+          </div>
+          <div *ngIf="!sendingAmountModel.errors && (sendingAmountModel.dirty || sendingAmountModel.touched)"
+              class="help is-danger">
+              <p [hidden]="canBeNumber(sendingAmount)">
+                Must be a number
+              </p>
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">To Address</label>
+          <p class="control">
+            <input
+              [(ngModel)]="recipientAddress"
+              name="recipientAddress"
+              class="input"
+              type="text"
+              placeholder="0x93e66d9baea28c17d9fc393b53e3fbdd76899dae"
+              name="recipientAddress"
+              required
+              #recipientAddressModel="ngModel"
+            >
           </p>
-      </div>
-    </div>
-    <div class="field">
-      <label class="label">To Address</label>
-      <p class="control">
-        <input
-          [(ngModel)]="recipientAddress"
-          name="recipientAddress"
-          class="input"
-          type="text"
-          placeholder="0x93e66d9baea28c17d9fc393b53e3fbdd76899dae"
-          name="recipientAddress"
-          required
-          #recipientAddressModel="ngModel"
-        >
-      </p>
-      <div *ngIf="recipientAddressModel.errors && (recipientAddressModel.dirty || recipientAddressModel.touched)"
-           class="help is-danger">
-          <p [hidden]="!recipientAddressModel.errors.required">
-            This field is required
-          </p>
-      </div>
-      <div *ngIf="!recipientAddressModel.errors && (recipientAddressModel.dirty || recipientAddressModel.touched)"
-           class="help is-danger">
-          <p [hidden]="canBeNumber(recipientAddress)">
-            Must be a number
-          </p>
-      </div>
-    </div>
+          <div *ngIf="recipientAddressModel.errors && (recipientAddressModel.dirty || recipientAddressModel.touched)"
+              class="help is-danger">
+              <p [hidden]="!recipientAddressModel.errors.required">
+                This field is required
+              </p>
+          </div>
+          <div *ngIf="!recipientAddressModel.errors && (recipientAddressModel.dirty || recipientAddressModel.touched)"
+              class="help is-danger">
+              <p [hidden]="canBeNumber(recipientAddress)">
+                Must be a number
+              </p>
+          </div>
+        </div>
 
-    <div class="field is-grouped">
-      <p class="control">
-        <button
-          [disabled]="!coinForm.valid"
-          (click)="sendCoin()"
-          class="button is-primary">
-          Send
-        </button>
-      </p>
+        <div class="field is-grouped">
+          <p class="control">
+            <button
+              [disabled]="!coinForm.valid"
+              (click)="sendCoin()"
+              class="button is-primary">
+              Send
+            </button>
+          </p>
+        </div>
+      </form>-->
     </div>
-  </form>-->
+  </section>
+  <section class="column">
+    <app-side-menu></app-side-menu>
+  </section>
 </div>
+
+
+
